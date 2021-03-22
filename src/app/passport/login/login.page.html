@@ -1,0 +1,55 @@
+<ion-header >
+  <ion-toolbar >
+    <ion-title style="text-align: center;">登录</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-segment  [(ngModel)]="tab">
+    <ion-segment-button value="tab1" (click)="clear()">
+      <ion-label>用户名登录</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="tab2" (click)="clear()">
+      <ion-label>手机登录</ion-label>
+    </ion-segment-button>
+  </ion-segment> 
+  <div [ngSwitch]="tab" style="margin:30px auto;">
+    <div *ngSwitchCase="'tab1'">
+      <ion-list class="inp" style="margin-top:30px auto;">
+        <ion-item padding >
+          <ion-label>用户名</ion-label>
+          <ion-input type="text" placeholder="请输入账号" [(ngModel)]="user.username"></ion-input>
+        </ion-item> 
+        <ion-item>
+          <ion-label>密码</ion-label>
+          <ion-input type="password" placeholder="请输入密码" [(ngModel)]="user.password"></ion-input>
+        </ion-item>  
+      </ion-list>
+    </div>
+  
+    <div *ngSwitchCase="'tab2'">
+      <ion-list class="inp" style="margin-top:30px auto;">
+        <ion-item padding >
+          <ion-label>手机</ion-label>
+          <ion-input type="text" placeholder="请输入手机号" [(ngModel)]="userPhone.username"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>密码</ion-label>
+          <ion-input type="password"  placeholder="请输入密码" [(ngModel)]="userPhone.password"></ion-input> 
+        </ion-item> 
+        </ion-list>
+    </div>
+    <ion-item>
+      <ion-input type="text" placeholder="请输入验证码" [(ngModel)]="verificationCode"></ion-input>
+      <img id="vericode" (click)="newcode()"/>
+    </ion-item> 
+    <div style="margin:8px auto;">
+      <!-- <a (click)="forgetPass()" style="float:left;width:20%;text-align: center;text-decoration: none;" >忘记密码</a> -->
+      <a (click)="register()"  style="float:right;width:20%;text-align: center;text-decoration: none;">注册</a>
+    </div>
+  <ion-button (click)="login()" color="primary" expand="block" style="height:40px;width:60%;margin:40px auto;font-size:20px"  shape="round">
+    登 &nbsp;&nbsp;&nbsp;录
+  </ion-button>
+  </div>
+      <p *ngIf="wrong==1" style="text-align: center;">{{wrongMsg}}</p>
+</ion-content> 
+

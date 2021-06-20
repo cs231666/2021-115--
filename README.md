@@ -1,9 +1,24 @@
-2021-福州大学-工程实践15组
+# test2
 
-到云移动端开发
+## Project setup
+```
+yarn install
+```
 
-到云移动端产品需求文档：https://docs.qq.com/doc/DZGp0cmh0U1ByZHNV
+### Compiles and hot-reloads for development
+```
+yarn serve
+```
 
-到云管理系统产品需求文档：https://docs.qq.com/doc/DZExxeEV6QkVwVXZ2
+### Compiles and minifies for production
+```
+yarn build
+```
 
-项目开发总结报告：https://docs.qq.com/doc/DZExJZlViYUF4WGh1
+### Lints and fixes files
+```
+yarn lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

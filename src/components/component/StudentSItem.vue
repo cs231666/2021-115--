@@ -2,20 +2,16 @@
   <section class="orderItem">
     <div class="row" style="min-height: 60px">
       <div class="shop_header">
-        <!-- <img :src="value.img" alt=""> -->
-        <div style="margin: 10px; float: left">{{ index }}</div>
-        <div class="shop_text">
+        <div style="margin: 10px; float: left">{{ value.rank }}</div>
+         <img src="../../assets/touxiang.png" alt="" />
+        <div class="shop_text-2">
           <h2 class="fn-15 fw-2">
-            <span> {{ value.name }}</span>
+            <span> {{ value.realname }}</span>
           </h2>
           <span class="fn-c-memo-light">{{ value.studentId }}</span>
         </div>
-        <div style="justify-content: flex-end">
-          <img
-            style="width: 20px; height: 20px"
-            src="../../assets/img/right.png"
-            alt=""
-          />
+        <div style="flex-grow: 1;text-align: end;">
+         <span style="font-size: 100%"> {{ value.score }}经验值</span>
         </div>
       </div>
     </div>
@@ -45,7 +41,7 @@ export default {
 
 <style lang="scss">
 .orderItem {
-  min-height: 120px;
+  min-height: 60px;
   .row {
     /* margin-top: 90px; */
     align-items: center;
@@ -57,8 +53,8 @@ export default {
       flex: 5;
       display: flex;
       align-items: center;
-      .shop_text {
-        width: calc(100% - 103px);
+      .shop_text-2 {
+        // width: calc(100% - 130px);
         span {
           overflow: hidden;
           white-space: nowrap;
@@ -71,22 +67,9 @@ export default {
           position: relative;
           display: flex;
           align-items: center;
-          // &::after {
-          /* //   background-image: url('../../../../static/img/icon/right.png'); */
-          //   content: "";
-          //   display: block;
-          //   height: 15px;
-          //   width: 15px;
-          //   position: absolute;
-          //   right: -24px;
-          //   top: 4px;
-          //   background-size: 15px 15px;
-          // }
           img {
             height: 15px;
-            width: 15px; // top: -5px;
-            // right: -15px;
-            // position: absolute;
+            width: 15px; 
             margin: 5px;
           }
         }
@@ -110,7 +93,7 @@ export default {
       margin: 0;
     }
     .order_state {
-      flex: 0.6; // flex: 0 0 100px;
+      flex: 0.6; 
       display: flex;
       align-items: center;
     }

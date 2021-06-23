@@ -11,11 +11,11 @@
       <section class="content has-header">
         <section class="header primary_bg">
           <div class="left">
-            <img src="..\assets\header.jpg" alt="">
+            <img src="..\assets\touxiang.png" alt="">
           </div>
 					<div >
-						<h3 class="fn-14">刘德华</h3>
-						<span class="fn-9">13771162599</span>
+						<h3 class="fn-14" >{{name}}</h3>
+						<span class="fn-9">{{phone}}</span>
 					</div>
 					<div class="right">
 						<img src="..\assets\icon\right-w.png" alt="">
@@ -24,9 +24,8 @@
       </section>
       <br>
       <mt-field label="姓名" class="fn-14" placeholder="请输入您的姓名" v-model="editUserForm.UserName"></mt-field>
-      <mt-field label="昵称" class="fn-14" placeholder="请输入您的昵称" v-model="editUserForm.NserName"></mt-field>
       <div class="select" @click="popupVisible = true">
-        <mt-cell title="出 生 年 月" is-link>
+        <mt-cell title="出生年份" is-link>
           <span> {{currentTags.length?currentTags: '1980年'}}</span>
         </mt-cell>
       </div>
@@ -35,16 +34,50 @@
             <mt-button style="width: 375px;" @click="handleConfirm" class="sure">确认</mt-button>
         </mt-picker>
       </mt-popup>
-      <br>
-      <mt-cell title="选 择 性 别">
+      <mt-cell title="选择性别">
       </mt-cell>
       <mt-radio  v-model="editUserForm.sex" align="right" :options="['男','女']"></mt-radio> 
-      <br>
-      <mt-cell title="选 择 身 份">
+      <div class="select" @click="pickerVisible = true">
+        <mt-cell title="学校院系" is-link>
+          <span>
+            {{
+              currentTags1.length
+                ? currentTags1 + currentTags2
+                : "请选择院系"
+            }}</span
+          >
+        </mt-cell>
+      </div>
+      <mt-popup
+        style="width: 375px"
+        v-model="pickerVisible"
+        position="bottom"
+        size="large"
+      >
+        <div class="picker-toolbar">
+          <span @click="cancel">取消</span>
+          <span class="mint-datetime-confirm" @click="confirm">确定</span>
+        </div>
+        <mt-picker
+          style="width: 180px; float: left"
+          ref="pickerObj"
+          :slots="slots1"
+          @change="onValuesChange"
+          valueKey="name"
+        ></mt-picker>
+        <mt-picker
+          style="width: 180px; float: right"
+          ref="pickerObj1"
+          :slots="slots2"
+          valueKey="name"
+        ></mt-picker>
+      </mt-popup>
+     
+      <mt-cell title="选择身份">
       </mt-cell>
-      <mt-radio  v-model="editUserForm.Identity" align="right" :options="['我是老师','我是学生','其他']"></mt-radio> 
-      <br>
+      <mt-radio  v-model="editUserForm.Identity" align="right" :options="[{label: '我是学生', value: '0'}, {label: '我是老师', value: '1'}]"></mt-radio> 
       <mt-field label="学号/工号" class="fn-14" placeholder="请输入您的学号或者工号" v-model="editUserForm.Idnum"></mt-field>
+      <br>
     </div> 
     <mt-button type="primary" @click.native="edituserinfo" size="large">确定</mt-button>
   </div>
@@ -52,21 +85,28 @@
 </template>
 
 <script>
-import { Cell } from "mint-ui";
-import moment from "moment";
 import { MessageBox } from "mint-ui";
+import { getSchool ,getCollege} from "@/api/school.js";
+import {updateUserInfo,getUserInfo} from "@/api/user.js"
 export default {
   data() {
     return {
+      phone: "",
+      name: "",
+      school:"",
+      schools:[],
+      schoolId: 0,
+      pickerVisible: false,
       popupVisible: false,
       editUserForm: {
         UserName: "",
-        NserName: "",
         sex: "",
         Idnum: "",
         Identity: "",
       },
       currentTags: {},
+      currentTags1: {},
+      currentTags2: {},
       slots: [
         {
           flex: 1,
@@ -74,10 +114,135 @@ export default {
           className: 'slot1',
         },
       ],
+      slots1: [
+        {
+          flex: 1,
+          values: [],
+          defaultIndex: 0,
+          className: "slot1",
+          textAlign: "left",
+        },
+        {
+          divider: true,
+          content: "-",
+          className: "slot2",
+          textAlign: "center",
+        },
+      ],
+      slots2: [
+        {
+          flex: 1,
+          values: [
+           
+          ],
+          defaultIndex: 1,
+          className: "slot3",
+          textAlign: "right",
+        },
+      ],
     };
   },
+  activated(){
+    this.getInfo();
+    this.getSchool();
+  },
+  deactivated(){
+    this.editUserForm.UserName = "";
+    this.editUserForm.sex = "";
+    this.editUserForm.Idnum = "";
+    this.editUserForm.Identity = "";
+    this.name = "";
+    this.phone = "";
+    this.currentTags = "";
+    this.currentTags1 = "";
+    this.currentTags2 = "";
+  },
   methods: {
+    cancel() {},
+    confirm() {
+      this.currentTags1 = this.$refs.pickerObj.getValues()[0] + " ";
+      this.currentTags2 = this.$refs.pickerObj1.getValues()[0];
+      this.pickerVisible = false;
+    },
+    onValuesChange(picker, values) {
+      this.school = picker.getSlotValue(0);
+      this.getCollege();
+        if (values[0] && values[0].userlist != undefined) {
+          this.slots1[0].values = [];
+          for (var key in values[0].userlist) {
+            this.slots1[0].values.push(values[0].userlist[key]);
+          }
+        }
+    },
+    getInfo(){
+      this.phone = this.$route.params.phone;
+      this.name = localStorage.getItem("realname");
+      getUserInfo().then((res) => {
+        if (res.data.code != 200) {
+          MessageBox("提示", "获取用户列表失败");
+        } else {
+          console.log("success")
+          console.log(res);
+          let org = res.data.obj.org.split(' ')
+          this.currentTags = res.data.obj.birthday + "年";
+          this.editUserForm.UserName = res.data.obj.realname;
+          this.editUserForm.sex = res.data.obj.sex;
+          this.editUserForm.Idnum = res.data.obj.studentId;
+          console.log(org[0]);
+          console.log(org[1]);
+          this.currentTags1 = org[0];
+          this.currentTags2 = org[1]?org[1]:"";
+          this.editUserForm.Identity = res.data.obj.role+"";
+        }
+      });
+    },
+    async getSchool(){
+      getSchool().then(response => {
+        this.schools = response.data.obj;
+        this.slots1[0].values = this.schools.map(item => item.name);
+        
+      })
+    },
+    async getCollege(){
+      for(var i = 0;i<this.schools.length;i++){
+        if(this.school == this.schools[i].name){
+          this.schoolId  = this.schools[i].detailId;
+        }
+      }
+      getCollege(this.schoolId).then(res => {
+        this.slots2[0].values = res.data.obj.map(item => item.name);
+      })
+	  },
+
+
     edituserinfo(){
+      if(this.editUserForm.UserName == ""){
+        MessageBox("提示", "姓名不能为空");
+      }
+      else if(this.editUserForm.Identity == ""){
+        MessageBox("提示", "学工号不能为空");
+      }
+      console.log("院系信息");
+      console.log(this.currentTags1+this.currentTags2);
+      let userInfo = {
+        birthday: this.currentTags.substr(0,this.currentTags.length - 1),
+        org: this.currentTags1+this.currentTags2,
+        realname: this.editUserForm.UserName,
+        role: parseInt(this.editUserForm.Identity),
+        sex: this.editUserForm.sex,
+        studentId: this.editUserForm.Idnum
+      }
+      updateUserInfo(userInfo).then(res => {
+        if(res.data.code!=200){
+          MessageBox("提示", res.data.msg);
+        }
+        else{
+          MessageBox.alert("更新成功！","提示").then(action => {
+            this.$router.push("/userinfo")
+          });
+        }
+      })
+
 
     },
     handleConfirm () {
@@ -100,15 +265,12 @@ $hei: 65px;
     }
     .content {
         .content-tabs {
-            // align-items: center;
-            // min-height: $hei;
+          
             display: flex;
             background-color: white;
             div {
                 padding: 12px 0px;
-                text-align: center; // display: flex;
-                // align-items: center;
-                // height: $hei;
+                text-align: center;
                 text-align: center;
                 border-right: 1px solid rgb(229, 229, 229);
                 flex: 1;

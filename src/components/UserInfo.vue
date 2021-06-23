@@ -18,9 +18,6 @@
     <div slot="content">
       <section class="content has-header">
         <section class="header primary_bg">
-          <div class="left">
-            <img src="..\assets\header.jpg" alt="" />
-          </div>
           <section class="title">
             <h3 class="fn-16">未设置</h3>
             <span class="fn-13">13188888888</span>
@@ -90,17 +87,18 @@
         </mt-cell>
       </section>
       <mt-cell title="姓名" v-model="userInfo.realname"></mt-cell>
+       <mt-cell title="学号" v-model="userInfo.studentId"></mt-cell>
       <mt-cell title="性别" v-model="userInfo.sex"></mt-cell>
       <mt-cell title="身份">{{userInfo.role ? '老师' : '学生'}}</mt-cell>
-      <mt-cell title="所在学校" v-model="userInfo.school"></mt-cell>
+      <mt-cell title="所在学校" v-model="userInfo.org"></mt-cell>
 	  <mt-cell
 	    title="修改信息"
-	    :to="{ path: '/edituserinfo', query: { name: userInfo.name } }"
+	    @click.native="updateInformation"
 	    is-link
 	  ></mt-cell>
       <mt-cell
         title="修改密码"
-        :to="{ path: '/editpassword', query: { name: userInfo.name } }"
+        :to="{ path: '/editpassword', params: { phone: userInfo.phone } }"
         is-link
       ></mt-cell>
     </div>
@@ -131,9 +129,6 @@
 </template>
 
 <script>
-import { Cell } from "mint-ui";
-import Cookies from "js-cookie";
-import Axios from "axios";
 import moment from "moment";
 import { MessageBox } from "mint-ui";
 import { getUserInfo } from "@/api/user.js";
@@ -146,11 +141,12 @@ export default {
       showHome: false,
       positons: {},
       userInfo: {
-        name: "xhan",
-        sex: "女",
-        tel: "13555555555",
-        identity: "老师",
-        school: "未设置",
+        name: "",
+        studentId:"",
+        sex: "",
+        tel: "",
+        identity: "",
+        org: "未设置",
       },
       list: [],
       list_two: [],
@@ -161,7 +157,6 @@ export default {
     this.getUserInfo();
   },
   watch: {
-    //监听控件弹出
     ["$store.state.common.popObj"]: {
       handler(newVal) {
         this.isScroll = true;
@@ -207,8 +202,6 @@ export default {
     },
     async getUserInfo() {
       getUserInfo().then((res) => {
-        console.log(res.code);
-        console.log(res.data.obj);
         if (res.data.code != 200) {
           MessageBox("提示", "获取用户列表失败");
         } else {
@@ -218,6 +211,16 @@ export default {
           localStorage.setItem("studentId", res.data.obj.studentId);
           localStorage.setItem("id", res.data.obj.id);
         }
+        if(this.userInfo.realname == null){
+          MessageBox.alert("姓名不能为空","提示").then(action => {
+			      this.$router.push({ name: "EditUserInfo", params: { phone:this.userInfo.phone } });
+			    });
+        }
+        else if(this.userInfo.studentId == null){
+          MessageBox.alert("学工号不能为空","提示").then(action => {
+			      this.$router.push({ name: "EditUserInfo", params: { phone:this.userInfo.phone } });
+			    });
+        }
       });
     },
     //退出登录
@@ -225,6 +228,9 @@ export default {
       this.cookie.clearCookie("sid");
       window.localStorage.removeItem("sid");
       this.$router.push("/login");
+    },
+    updateInformation(){
+      this.$router.push({ name: "EditUserInfo", params: { phone:this.userInfo.phone } });
     },
   },
 };
@@ -254,8 +260,6 @@ export default {
   }
   .content {
     .content-tabs {
-      // align-items: center;
-      // min-height: $hei;
       display: flex;
       background-color: white;
       div {

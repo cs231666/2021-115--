@@ -1,45 +1,40 @@
 <template>
   <div>
-    <mt-header title="班课详情">
+    <mt-header title="班课成员" :fixed="true">
       <router-link to="/classteacher" slot="left">
-        <mt-button icon="back">班课</mt-button>
+        <mt-button icon="back">我创建的</mt-button>
       </router-link>
     </mt-header>
-    <router-link
-      :to="{ path: '/signedteacher', query: { classes_id: this.classes_id } }"
-      slot="left"
-    >
-      <mt-button>发起签到</mt-button>
-    </router-link>
-    <router-link :to="`/code/${this.$route.params.courseId}`" slot="right">
-      <mt-button>班级二维码</mt-button>
-    </router-link>
+    <br><br>
     <mt-cell title="班课人数" :value="studentList.length"></mt-cell>
     <mt-cell title="班课ID" :value="classes_id"></mt-cell>
-    <mt-cell title="成员列表"></mt-cell>
-    <!-- 后台传该班课所有人经验与姓名(按经验值倒序排好序再传过来)，通过班课号来搜班课表里数据  -->
-    <mt-cell
-      v-for="(item, index) in studentList"
-      :key="index"
-      :title="index + 1 + '  ' + item.name"
-    />
+    <mt-cell title="成员列表">{{ studentList.length }} 人</mt-cell>
+      <div slot="content" class="order_content has-header">
+        <div
+          style="margin-top: 10px; background: white"
+          v-for="(item, index) in studentList"
+          :key="index"
+        >
+          <StudentSItem :value="item" :index="index" />
+        </div>
+      </div>
     <mt-tabbar :selected.sync="selected">
       <mt-tab-item id="成员">
         <img slot="icon" src="../assets/chengyuan.png" />
-        <router-link to="/classteacherdetail">
+        <router-link :to="`/classteacherdetail/${this.$route.params.courseId}`">
           <font size="3">成员</font>
         </router-link>
       </mt-tab-item>
       <mt-tab-item id="添加活动">
         <img slot="icon" src="../assets/huodong.png" />
-        <router-link to="/activity">
-          <font size="3">添加活动</font>
+        <router-link :to="`/addedactivity/${this.$route.params.courseId}`">
+          <font size="3">活动</font>
         </router-link>
       </mt-tab-item>
-      <mt-tab-item id="消息">
+      <mt-tab-item id="详情">
         <img slot="icon" src="../assets/xiaoxi.png" />
-        <router-link to="/information">
-          <font size="3">消息</font>
+        <router-link :to="`/informationteacher/${this.$route.params.courseId}`">
+          <font size="3">班课详情</font>
         </router-link>
       </mt-tab-item>
     </mt-tabbar>
@@ -47,11 +42,19 @@
 </template>
 
 <script>
+import {getCourseMember} from "@/api/course.js";
 export default {
+  components: {
+    StudentSItem: (r) => {
+      require.ensure([], () => r(require("./component/StudentSItem.vue"))),
+        "StudentSItem";
+    },
+  },
   data() {
     return {
       classes_id: "",
       studentList: [],
+      selected: "",
     };
   },
   computed: {
@@ -59,10 +62,18 @@ export default {
       return this.$route.params.courseId;
     },
   },
-  // activated() {
-  //   this.getClassInfo();
-  // },
-  methods: {},
+  activated() {
+    this.getClassInfo();
+  },
+  methods: {
+    getClassInfo(){
+      this.classes_id = this.$route.params.courseId;
+      getCourseMember(this.$route.params.courseId).then(res => {
+        this.studentList = res.data.obj;
+      })
+    }
+  },
+
 };
 </script>
 

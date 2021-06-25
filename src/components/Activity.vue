@@ -4,10 +4,12 @@
       style="-webkit-transform: translateZ(0)"
       slot="header"
       class="primary_bg"
-      title="活动"
-      color="black"
+      title="活动列表"
       :fixed="true"
     >
+      <router-link to="/class" slot="left">
+        <mt-button icon="back">我加入的</mt-button>
+      </router-link>
     </mt-header>
     <br />
     <br />
@@ -38,20 +40,20 @@
     <mt-tabbar :selected.sync="selected">
       <mt-tab-item id="成员">
         <img slot="icon" src="../assets/chengyuan.png" />
-        <router-link to="/classdetail">
+        <router-link :to="`/classdetail/${this.$route.params.courseId}`">
           <font size="3">成员</font>
         </router-link>
       </mt-tab-item>
       <mt-tab-item id="活动">
         <img slot="icon" src="../assets/huodong.png" />
-        <router-link to="/activity">
+        <router-link :to="`/activity/${this.$route.params.courseId}`">
           <font size="3">活动</font>
         </router-link>
       </mt-tab-item>
-      <mt-tab-item id="消息">
+      <mt-tab-item id="详情">
         <img slot="icon" src="../assets/xiaoxi.png" />
-        <router-link to="/information">
-          <font size="3">消息</font>
+        <router-link :to="`/information/${this.$route.params.courseId}`">
+          <font size="3">详情</font>
         </router-link>
       </mt-tab-item>
     </mt-tabbar>
@@ -66,7 +68,9 @@ import moment from "moment";
 import { MessageBox } from "mint-ui";
 export default {
   data() {
-    return {};
+    return {
+      selected: "",
+    };
   },
 };
 </script>
